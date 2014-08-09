@@ -1,0 +1,13 @@
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    version="2.0">
+	
+    <persistence-unit name="peopleDb" transaction-type="JTA">
+  	    <jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=peopleDb)</jta-data-source>  	    
+        <class>com.example.data.model.Person</class>
+        
+        <properties>
+        	<property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema"/>        	
+        </properties>        
+    </persistence-unit>
+</persistence>
