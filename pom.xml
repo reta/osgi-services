@@ -12,13 +12,24 @@
     <properties>
         <cxf.version>2.7.7</cxf.version>
         <hibernate.version>4.2.7.Final</hibernate.version>
+        <jvm.memory.options>-Xms512m -Xmx2048m -XX:MaxMetaspaceSize=1024m</jvm.memory.options>
+        <jacoco.it.execution.data.file>${project.build.directory}/coverage-reports/jacoco-it.exec</jacoco.it.execution.data.file>
+		<jacoco.ut.execution.data.file>${project.build.directory}/coverage-reports/jacoco-ut.exec</jacoco.ut.execution.data.file>
+        <surefire.argLine>${jvm.memory.options} ${argLine}</surefire.argLine>
+		<surefire.test.threads>8</surefire.test.threads>
+		<failsafe.argLine>${jvm.memory.options} ${failsafeArgLine}</failsafe.argLine>
+		<sonar.jacoco.itReportPath>${project.build.directory}/coverage-reports/jacoco-it.exec</sonar.jacoco.itReportPath>
+		<sonar.jacoco.reportPath>${project.build.directory}/coverage-reports/jacoco-ut.exec</sonar.jacoco.reportPath>
+		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+    	<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis> 
     </properties>
 
     <modules>
         <module>module-jax-rs</module>
         <module>module-services</module>
+        <module>module-ds</module>
         <module>module-data</module>
-    </modules>
+</modules>
     
     <dependencyManagement>
     	<dependencies>
@@ -51,11 +62,6 @@
             <scope>provided</scope>
         </dependency>
 
-<!--         <dependency> -->
-<!--             <groupId>org.apache.commons</groupId> -->
-<!--             <artifactId>commons-lang3</artifactId> -->
-<!--             <version>3.1</version> -->
-<!--         </dependency> -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -76,6 +82,22 @@
             <version>4.3.1</version>
             <scope>provided</scope>
         </dependency>
+        
+        <dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>6.8.13</version>
+			<scope>test</scope>
+		</dependency>
+		
+	
+    <dependency>
+      <groupId>org.codehaus.sonar-plugins.java</groupId>
+      <artifactId>sonar-jacoco-listeners</artifactId>
+      <version>1.2</version>
+      <scope>test</scope>
+    </dependency>
+ 
     </dependencies>
     
     <build>
@@ -90,6 +112,97 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
-        </plugins>         
+        </plugins>   
+        
+        <pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.17</version>
+					<configuration>
+						<skipTests>${skip.surefire.tests}</skipTests>
+						<argLine>${surefire.argLine}</argLine>
+						<threadCount>${surefire.test.threads}</threadCount>
+						<parallel>classes</parallel>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.jacoco</groupId>
+					<artifactId>jacoco-maven-plugin</artifactId>
+					<version>0.7.1.201405082137</version>
+					<executions>
+						<execution>
+							<id>pre-unit-test</id>
+							<goals>
+								<goal>prepare-agent</goal>
+							</goals>
+							<configuration>
+								<destFile>${jacoco.ut.execution.data.file}</destFile>
+							</configuration>
+						</execution>
+						<execution>
+							<id>post-unit-test</id>
+							<phase>test</phase>
+							<goals>
+								<goal>report</goal>
+							</goals>
+							<configuration>
+								<dataFile>${jacoco.ut.execution.data.file}</dataFile>
+								<outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
+							</configuration>
+						</execution>
+						<execution>
+							<id>pre-integration-test</id>
+							<phase>pre-integration-test</phase>
+							<goals>
+								<goal>prepare-agent-integration</goal>
+							</goals>
+							<configuration>
+								<destFile>${jacoco.it.execution.data.file}</destFile>
+								<propertyName>failsafeArgLine</propertyName>
+								<append>true</append>
+							</configuration>
+						</execution>
+						<execution>
+							<id>post-integration-test</id>
+							<phase>post-integration-test</phase>
+							<goals>
+								<goal>report</goal>
+							</goals>
+							<configuration>
+								<dataFile>${jacoco.it.execution.data.file}</dataFile>
+								<outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
+								<append>true</append>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<version>2.18</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>integration-test</goal>
+								<goal>verify</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<argLine>${failsafe.argLine}</argLine>
+					</configuration>
+					<dependencies>
+						<!-- Restrict failsafe to unit tests for now. -->
+						<dependency>
+							<groupId>org.apache.maven.surefire</groupId>
+							<artifactId>surefire-testng</artifactId>
+							<version>2.17</version>
+						</dependency>
+					</dependencies>
+				</plugin>
+			</plugins>
+		</pluginManagement>      
     </build>
 </project>

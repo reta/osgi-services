@@ -3,6 +3,7 @@ package com.example.data.impl;
 import java.util.Collection;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 
@@ -10,6 +11,7 @@ import com.example.data.PeopleDao;
 import com.example.data.model.Person;
 
 public class PeopleDaoImpl implements PeopleDao {
+	@PersistenceContext(unitName = "peopleDb")
 	private EntityManager entityManager;
 	
 	@Override

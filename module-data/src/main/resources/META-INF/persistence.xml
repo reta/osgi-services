@@ -1,13 +1,15 @@
-<persistence xmlns="http://java.sun.com/xml/ns/persistence"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    version="2.0">
-	
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
+             version="2.1">
     <persistence-unit name="peopleDb" transaction-type="JTA">
-  	    <jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=peopleDb)</jta-data-source>  	    
+  	    <jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=jdbc/peopleDb)</jta-data-source>
+  	    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>com.example.data.model.Person</class>
         
         <properties>
-        	<property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema"/>        	
-        </properties>        
+        	<property name="hibernate.hbm2ddl.auto" value="create"/>
+        	<property name="hibernate.dialect" value="HSQL"/>
+        </properties>
     </persistence-unit>
 </persistence>
